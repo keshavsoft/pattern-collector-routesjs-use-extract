@@ -24,9 +24,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Update pattern-collector
+      - name: Update pattern-collector-routesjs-use
         run: |
-          npm install pattern-collector@latest
+          npm install pattern-collector-routesjs-use@latest
 
       - name: Run Tests
         run: |
@@ -37,4 +37,4 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add package.json package-lock.json
-          git diff-index --quiet HEAD || (git commit -m "chore: update dependency pattern-collector" && git push origin main)
+          git diff-index --quiet HEAD || (git commit -m "chore: update dependency pattern-collector-routesjs-use" && git push origin main)
