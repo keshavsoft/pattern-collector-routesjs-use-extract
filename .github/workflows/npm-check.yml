@@ -1,0 +1,46 @@
+name: Check NPM Registry Status
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-npm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Check package status on NPM
+        run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          
+          # Fetch latest version from NPM registry
+          LATEST_VERSION=$(npm view "$PACKAGE_NAME" version 2>/dev/null || echo "None")
+          
+          echo "### 🔍 NPM Registry Status Check" >> $GITHUB_STEP_SUMMARY
+          echo "* **Package**: \`$PACKAGE_NAME\`" >> $GITHUB_STEP_SUMMARY
+          echo "* **Current Local Version**: \`$PACKAGE_VERSION\`" >> $GITHUB_STEP_SUMMARY
+          echo "* **Latest Registry Version**: \`$LATEST_VERSION\`" >> $GITHUB_STEP_SUMMARY
+          
+          if npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version >/dev/null 2>&1; then
+            echo "* **Status**: ⚠️ Already Published (Version \`$PACKAGE_VERSION\` exists on NPM)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "* **Status**: ✅ Ready to Publish (Version \`$PACKAGE_VERSION\` does not exist on NPM)" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "* **Registry Link**: [https://www.npmjs.com/package/$PACKAGE_NAME](https://www.npmjs.com/package/$PACKAGE_NAME)" >> $GITHUB_STEP_SUMMARY
