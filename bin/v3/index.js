@@ -1,4 +1,4 @@
-import getAllMatches from "pattern-collector-endpointsjs-use";
+import getAllMatches from "pattern-collector-routesjs-use";
 
 const startFunc = ({ inFilePath }) => {
 
@@ -6,12 +6,13 @@ const startFunc = ({ inFilePath }) => {
 
     return matches.map(match => {
         const clean = match.replace(/[\r\n]/g, '');
-        const parseRegex = /router\.(get|post|put|delete|patch|use)\s*\(\s*['"`]([^'"`]+)['"`]/;
+        const parseRegex = /router\.use\s*\(\s*['"`]\/?([^'"`]+)['"`]\s*,\s*(\w+)/;
         const parts = clean.match(parseRegex);
         if (parts) {
             return {
-                method: parts[1],
-                endpoint: parts[2]
+                // routeName from folderName
+                routeName: parts[1],
+                variableName: parts[2]
             };
         }
         return null;
