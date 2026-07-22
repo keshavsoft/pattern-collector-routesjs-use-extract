@@ -5,6 +5,10 @@ on:
     types: [dependency-updated]
   workflow_dispatch:
 
+concurrency:
+  group: update-dependency-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
