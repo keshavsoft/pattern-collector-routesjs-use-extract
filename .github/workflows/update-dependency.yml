@@ -23,6 +23,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: npm install
@@ -44,10 +45,15 @@ jobs:
           if git diff-index --quiet HEAD; then
             echo "has_changes=false" >> $GITHUB_OUTPUT
           else
-            git commit -m "chore: update dependencies"
+            npm version patch --no-git-tag-version
+            npm publish
+            git add package.json package-lock.json
+            git commit -m "chore: update dependencies and bump version"
             git push origin main
             echo "has_changes=true" >> $GITHUB_OUTPUT
           fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create Summary
         run: |
